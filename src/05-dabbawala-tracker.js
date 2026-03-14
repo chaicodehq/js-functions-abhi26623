@@ -49,5 +49,59 @@
  *   // => { name: "Ram", area: "Dadar", total: 2, completed: 1, pending: 1, successRate: "50.00%" }
  */
 export function createDabbawala(name, area) {
-  // Your code here
+  let deliveries = [];
+  let nextId = 1;
+
+  return {
+    addDelivery(from, to) {
+      if (!from || !to || typeof from !== 'string' || typeof to !== 'string' || from.trim() === '' || to.trim() === '') {
+        return -1;
+      }
+      const id = nextId++;
+      deliveries.push({ id, from, to, status: "pending" });
+      return id;
+    },
+
+    completeDelivery(id) {
+      const delivery = deliveries.find(d => d.id === id);
+      if (delivery && delivery.status === 'pending') {
+        delivery.status = 'completed';
+        return true;
+      }
+      return false;
+    },
+
+    getActiveDeliveries() {
+      return deliveries
+        .filter(d => d.status === 'pending')
+        .map(d => ({ ...d })); // return copies
+    },
+
+    getStats() {
+      const total = deliveries.length;
+      const pending = deliveries.filter(d => d.status === 'pending').length;
+      const completed = total - pending;
+      
+      let successRate = "0.00%";
+      if (total > 0) {
+        successRate = ((completed / total) * 100).toFixed(2) + "%";
+      }
+
+      return {
+        name,
+        area,
+        total,
+        completed,
+        pending,
+        successRate
+      };
+    },
+
+    reset() {
+      deliveries = [];
+      nextId = 1; // "resets id counter to 0" wait, comment says starts from 1, and reset says id counter to 0? Let's check comment: Returns auto-incremented id (starting from 1). reset(): resets id counter to 0. Hmm so next adding gets 1. So setting it to 1 is correct.
+      // Wait, let's look at the comment again: "Clears all deliveries, resets id counter to 0." This implies next addition gets 1. 0++ is 0. So nextId should be 1. Let's set it back to 1.
+      return true;
+    }
+  };
 }
